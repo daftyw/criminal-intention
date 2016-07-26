@@ -119,7 +119,7 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "send position : " + _position);
-            Intent intent = CrimeActivity.newIntent(getActivity(), _crime.getId(), _position);
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), _crime.getId(), _position);
             startActivityForResult(intent, REQUEST_UPDATED_CRIME);
         }
     }
