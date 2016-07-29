@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.augmentis.ayp.crimin.model.Crime;
+import com.augmentis.ayp.crimin.model.CrimeLab;
+
 import java.util.List;
 
 /**
@@ -21,14 +24,14 @@ import java.util.List;
  */
 public class CrimeListFragment extends Fragment {
 
-    private static final int REQUEST_UPDATED_CRIME = 200;
+    protected static final int REQUEST_UPDATED_CRIME = 200;
 
     private RecyclerView _crimeRecyclerView;
 
-    private CrimeAdapter _adapter;
+    private CrimeListAdapter _adapter;
 
     protected static final String TAG = "CRIME_LIST";
-    private int crimePos;
+    private Integer[] crimePos;
 
     @Nullable
     @Override
@@ -51,12 +54,16 @@ public class CrimeListFragment extends Fragment {
         List<Crime> crimes = crimeLab.getCrimes();
 
         if(_adapter == null) {
-            _adapter = new CrimeAdapter(crimes);
+            _adapter = new CrimeListAdapter(this, crimes);
             _crimeRecyclerView.setAdapter(_adapter);
         } else {
             //_adapter.notifyDataSetChanged();
-            _adapter.notifyItemChanged(crimePos);
-            Log.d(TAG, "notify change at " + crimePos);
+            if(crimePos != null) {
+                for (Integer pos : crimePos) {
+                    _adapter.notifyItemChanged(pos);
+                    Log.d(TAG, "notify change at " + pos);
+                }
+            }
         }
     }
 
@@ -76,7 +83,7 @@ public class CrimeListFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_UPDATED_CRIME) {
             if(resultCode == Activity.RESULT_OK) {
-                crimePos = (int) data.getExtras().get("position");
+                crimePos = (Integer[]) data.getExtras().get("position");
                 Log.d(TAG, "get crimePos = " + crimePos);
             }
             // Blah blah
@@ -84,74 +91,4 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
-    /**
-     *
-     */
-    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView _titleTextView;
-        public TextView _dateTextView;
-        public CheckBox _solvedCheckBox;
-
-        Crime _crime;
-        int _position;
-
-        public CrimeHolder(View itemView) {
-            super(itemView);
-
-            _titleTextView = (TextView)
-                    itemView.findViewById(R.id.list_item_crime_title_text_view);
-            _solvedCheckBox = (CheckBox)
-                    itemView.findViewById(R.id.list_item_crime_solved_check_box);
-            _dateTextView = (TextView)
-                    itemView.findViewById(R.id.list_item_crime_date_text_view);
-
-            itemView.setOnClickListener(this);
-        }
-
-        public void bind(Crime crime, int position) {
-            _crime = crime;
-            _position = position;
-            _titleTextView.setText(_crime.getTitle());
-            _dateTextView.setText(_crime.getCrimeDate().toString());
-            _solvedCheckBox.setChecked(_crime.isSolved());
-        }
-
-        @Override
-        public void onClick(View v) {
-            Log.d(TAG, "send position : " + _position);
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), _crime.getId(), _position);
-            startActivityForResult(intent, REQUEST_UPDATED_CRIME);
-        }
-    }
-
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
-        private List<Crime> _crimes;
-        private int _viewCreatingCount;
-        public CrimeAdapter(List<Crime> crimes) {
-            this._crimes = crimes;
-        }
-
-        @Override
-        public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            _viewCreatingCount++;
-            Log.d(TAG, "Create view holder for CrimeList: creating view time= " + _viewCreatingCount);
-
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View v = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
-            return new CrimeHolder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(CrimeHolder holder, int position) {
-            Log.d(TAG, "Bind view holder for CrimeList : position = " + position);
-
-            Crime crime = _crimes.get(position);
-            holder.bind(crime, position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return _crimes.size();
-        }
-    }
 }

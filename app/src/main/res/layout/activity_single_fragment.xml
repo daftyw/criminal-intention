@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/fragment_container"
-    tools:context="com.augmentis.ayp.crimin.CrimeActivity">
+
+    android:layout_marginRight="@dimen/activity_horizontal_margin">
 
 </FrameLayout>

@@ -1,4 +1,4 @@
-package com.augmentis.ayp.crimin;
+package com.augmentis.ayp.crimin.model;
 
 import java.util.Date;
 import java.util.UUID;
