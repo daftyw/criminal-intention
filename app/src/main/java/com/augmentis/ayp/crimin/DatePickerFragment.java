@@ -26,6 +26,8 @@ public class DatePickerFragment extends DialogFragment implements DialogInterfac
     protected static final String EXTRA_DATE = "EXTRA_DATE";
     protected static final String ARGUMENT_DATE = "ARG_DATE";
 
+    private Calendar _calendar;
+
     // 1.
     public static DatePickerFragment newInstance(Date date) {
         DatePickerFragment df = new DatePickerFragment();
@@ -43,16 +45,17 @@ public class DatePickerFragment extends DialogFragment implements DialogInterfac
         // 3.
         Date date = (Date) getArguments().getSerializable(ARGUMENT_DATE);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        _calendar = Calendar.getInstance();
+        _calendar.setTime(date);
+        int year = _calendar.get(Calendar.YEAR);
+        int month = _calendar.get(Calendar.MONTH);
+        int dayOfMonth = _calendar.get(Calendar.DAY_OF_MONTH);
 
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_date, null);
 
         _datePicker = (DatePicker) v.findViewById(R.id.date_picker_in_dialog);
         _datePicker.init(year, month, dayOfMonth, null);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(v);
         builder.setTitle(R.string.date_picker_title);
@@ -67,7 +70,11 @@ public class DatePickerFragment extends DialogFragment implements DialogInterfac
         int month = _datePicker.getMonth();
         int year = _datePicker.getYear();
 
-        Date date = new GregorianCalendar(year, month, dayOfMonth).getTime();
+        _calendar.set(Calendar.YEAR, year);
+        _calendar.set(Calendar.MONTH, month);
+        _calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+        Date date = _calendar.getTime();
         sendResult(Activity.RESULT_OK, date);
     }
 
