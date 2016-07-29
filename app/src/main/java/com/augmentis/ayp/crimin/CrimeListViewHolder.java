@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.augmentis.ayp.crimin.model.Crime;
+import com.augmentis.ayp.crimin.model.CrimeDateFormat;
 
 /**
  * Created by Rawin on 28-Jul-16.
@@ -34,6 +35,7 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder implements View
                 itemView.findViewById(R.id.list_item_crime_title_text_view);
         _solvedCheckBox = (CheckBox)
                 itemView.findViewById(R.id.list_item_crime_solved_check_box);
+        _solvedCheckBox.setEnabled(false);
         _dateTextView = (TextView)
                 itemView.findViewById(R.id.list_item_crime_date_text_view);
 
@@ -44,7 +46,7 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder implements View
         _crime = crime;
         _position = position;
         _titleTextView.setText(_crime.getTitle());
-        _dateTextView.setText(_crime.getCrimeDate().toString());
+        _dateTextView.setText(CrimeDateFormat.toFullDate(_f.getActivity(), _crime.getCrimeDate()));
         _solvedCheckBox.setChecked(_crime.isSolved());
     }
 

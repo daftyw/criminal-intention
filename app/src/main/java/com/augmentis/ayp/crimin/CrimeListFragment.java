@@ -47,7 +47,11 @@ public class CrimeListFragment extends Fragment {
 
         if(savedInstanceState != null) {
             _subtitleVisible = savedInstanceState.getBoolean(SUBTITLE_VISIBLE_STATE);
+        } else {
+            _subtitleVisible = false;
         }
+
+        Log.d(TAG, "Subtitle show = " + String.valueOf(_subtitleVisible));
 
         updateUI();
 
@@ -69,6 +73,7 @@ public class CrimeListFragment extends Fragment {
 
         MenuItem menuItem = menu.findItem(R.id.menu_item_show_subtitle);
 
+        Log.d(TAG, "Creation of Menu");
         if(_subtitleVisible) {
             menuItem.setIcon(R.drawable.ic_hide_subtitle);
             menuItem.setTitle(R.string.hide_subtitle);

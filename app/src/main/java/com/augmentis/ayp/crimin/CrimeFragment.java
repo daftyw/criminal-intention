@@ -105,7 +105,7 @@ public class CrimeFragment extends Fragment {
         });
 
         crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
-        crimeTimeButton.setText(CrimeDateFormat.toTime(crime.getCrimeDate()));
+        crimeTimeButton.setText(CrimeDateFormat.toTime(getActivity(), crime.getCrimeDate()));
         crimeTimeButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -151,7 +151,7 @@ public class CrimeFragment extends Fragment {
 
             // set
             crime.setCrimeDate(date);
-            crimeTimeButton.setText(CrimeDateFormat.toTime(crime.getCrimeDate()));
+            crimeTimeButton.setText(CrimeDateFormat.toTime(getActivity(), crime.getCrimeDate()));
         }
     }
 }

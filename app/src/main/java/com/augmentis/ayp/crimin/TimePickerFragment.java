@@ -16,7 +16,7 @@ import java.util.Date;
  * Created by Rawin on 28-Jul-16.
  */
 public class TimePickerFragment extends DialogFragment
-        implements TimePickerDialog.OnTimeSetListener{
+        implements TimePickerDialog.OnTimeSetListener {
 
     protected static final String EXTRA_TIME = "EXTRA_TIME";
     protected static final String ARGUMENT_TIME = "ARG_TIME";
