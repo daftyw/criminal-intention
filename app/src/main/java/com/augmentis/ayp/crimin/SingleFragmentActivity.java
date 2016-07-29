@@ -8,12 +8,14 @@ import android.util.Log;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 
+    private static final String TAG = "SingleFragmentActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_fragment);
 
-        Log.d(CrimeListFragment.TAG, "On create activity");
+        Log.d(TAG, "On create activity");
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment f = fm.findFragmentById(R.id.fragment_container);
@@ -24,9 +26,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
             fm.beginTransaction()
                     .add(R.id.fragment_container, f)
                     .commit();
-            Log.d(CrimeListFragment.TAG, "Fragment is created");
+            Log.d(TAG, "Fragment is created");
         } else {
-            Log.d(CrimeListFragment.TAG, "Fragment have already been created");
+            Log.d(TAG, "Fragment have already been created");
 
         }
     }

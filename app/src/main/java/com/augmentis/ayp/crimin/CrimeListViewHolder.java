@@ -15,6 +15,7 @@ import com.augmentis.ayp.crimin.model.Crime;
  * Created by Rawin on 28-Jul-16.
  */
 public class CrimeListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener  {
+    private static final String TAG = "CrimeListViewHolder";
     public TextView _titleTextView;
     public TextView _dateTextView;
     public CheckBox _solvedCheckBox;
@@ -49,8 +50,8 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder implements View
 
     @Override
     public void onClick(View v) {
-        Log.d(CrimeListFragment.TAG, "send position : " + _position);
-        Intent intent = CrimePagerActivity.newIntent(_f.getActivity(), _crime.getId(), _position);
-        _f.startActivityForResult(intent, CrimeListFragment.REQUEST_UPDATED_CRIME);
+        Log.d(TAG, "send position : " + _position);
+        Intent intent = CrimePagerActivity.newIntent(_f.getActivity(), _crime.getId());
+        _f.startActivity(intent);
     }
 }

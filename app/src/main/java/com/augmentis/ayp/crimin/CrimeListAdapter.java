@@ -16,6 +16,7 @@ import java.util.List;
  * Created by Rawin on 28-Jul-16.
  */
 public class CrimeListAdapter extends RecyclerView.Adapter<CrimeListViewHolder> {
+    private static final String TAG = "CrimeListAdapter";
     private Fragment _f;
     private List<Crime> _crimes;
     private int _viewCreatingCount;
@@ -28,7 +29,7 @@ public class CrimeListAdapter extends RecyclerView.Adapter<CrimeListViewHolder> 
     @Override
     public CrimeListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         _viewCreatingCount++;
-        Log.d(CrimeListFragment.TAG, "Create view holder for CrimeList: creating view time= " + _viewCreatingCount);
+        Log.d(TAG, "Create view holder for CrimeList: creating view time= " + _viewCreatingCount);
 
         LayoutInflater layoutInflater = LayoutInflater.from(_f.getActivity());
         View v = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
@@ -37,7 +38,7 @@ public class CrimeListAdapter extends RecyclerView.Adapter<CrimeListViewHolder> 
 
     @Override
     public void onBindViewHolder(CrimeListViewHolder holder, int position) {
-        Log.d(CrimeListFragment.TAG, "Bind view holder for CrimeList : position = " + position);
+        Log.d(TAG, "Bind view holder for CrimeList : position = " + position);
 
         Crime crime = _crimes.get(position);
         holder.bind(crime, position);

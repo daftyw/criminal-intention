@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="3dp"
+    android:paddingTop="4dp"
     android:paddingRight="4dp"
     android:paddingLeft="4dp"
-    android:paddingBottom="10dp"
+    android:paddingBottom="4dp"
     style="?android:listSeparatorTextViewStyle">
 
     <CheckBox
