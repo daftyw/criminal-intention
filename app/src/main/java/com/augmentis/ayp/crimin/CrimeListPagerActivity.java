@@ -26,13 +26,13 @@ public class CrimeListPagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_crime_list_pager);
 
         mViewPager = (ViewPager) findViewById(R.id.crime_list_pager);
-
-        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+//
+//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return true;
+//            }
+//        });
 
         mViewPager.setAdapter(new FragmentStatePagerAdapter(
                 getSupportFragmentManager()) {
