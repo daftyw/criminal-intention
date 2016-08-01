@@ -33,6 +33,7 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
 
     private static final String CRIME_ID = "CrimeFragment.CRIME_ID";
+    private static final String IS_SAVE = "CrimeFragment.IS_SAVE";
 
     private static final String DIALOG_DATE = "CrimeFragment.DIALOG_DATE";
     private static final String DIALOG_TIME = "CrimeFragment.DIALOG_DATE";
@@ -48,6 +49,7 @@ public class CrimeFragment extends Fragment {
     private Button crimeTimeButton;
     private CheckBox crimeSolvedCheckbox;
 
+    private boolean isNew;
     public CrimeFragment() {}
 
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -68,7 +70,13 @@ public class CrimeFragment extends Fragment {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
 
         UUID crimeId =(UUID) getArguments().getSerializable(CRIME_ID);
-        crime = crimeLab.getCrimeById(crimeId);
+
+        if(crimeId != null) {
+            crime = crimeLab.getCrimeById(crimeId);
+        } else {
+            isNew = true;
+            crime = new Crime();
+        }
 
         Log.d(TAG, "crime.getTitle()=" + crime.getTitle());
     }
@@ -164,13 +172,6 @@ public class CrimeFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        CrimeLab.getInstance(getActivity()).updateCrime(crime); // update crime in db
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.crime_menu, menu);
@@ -181,12 +182,44 @@ public class CrimeFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_delete_crime:
                 CrimeLab.getInstance(getActivity()).deleteCrime(crime.getId());
-                getActivity().finish();
+                ((CrimeListPagerActivity) getActivity()).gotoList();
+                return true;
+            case R.id.menu_item_save:
+                if(isNew) {
+                    CrimeLab.getInstance(getActivity()).addCrime(crime);
+                } else {
+                    CrimeLab.getInstance(getActivity()).updateCrime(crime);
+                }
+                ((CrimeListPagerActivity) getActivity()).gotoList();
                 return true;
             default:
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setCurrentCrimeId(UUID currentCrimeId) {
+
+        getArguments().putSerializable(CRIME_ID, currentCrimeId);
+
+        Log.d(TAG, "Set current crimeId = " + currentCrimeId);
+
+        if(currentCrimeId != null) {
+            crime = CrimeLab.getInstance(getActivity()).getCrimeById(currentCrimeId);
+            isNew = false;
+            updateUI();
+        } else {
+            isNew = true;
+            crime = new Crime();
+            updateUI();
+        }
+    }
+
+    private void updateUI() {
+        editText.setText(crime.getTitle());
+        crimeDateButton.setText(CrimeDateFormat.toShortDate(crime.getCrimeDate()));
+        crimeTimeButton.setText(CrimeDateFormat.toTime(getActivity(), crime.getCrimeDate()));
+        crimeSolvedCheckbox.setChecked(crime.isSolved());
     }
 }

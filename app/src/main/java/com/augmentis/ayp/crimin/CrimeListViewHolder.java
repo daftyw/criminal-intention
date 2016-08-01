@@ -28,7 +28,6 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder
     public CheckBox _solvedCheckBox;
 
     UUID _crimeId;
-    int _position;
 
     Fragment _f;
 
@@ -59,9 +58,7 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder
 
     @Override
     public void onClick(View v) {
-        Log.d(TAG, "send position : " + _position);
-        Intent intent = CrimePagerActivity.newIntent(_f.getActivity(), _crimeId);
-        _f.startActivity(intent);
+        ((CrimeListPagerActivity) _f.getActivity()).gotoCrime(_crimeId);
     }
 
     @Override

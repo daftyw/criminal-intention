@@ -88,10 +88,7 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_new_crime:
 
-                Crime crime = new Crime();
-                CrimeLab.getInstance(getActivity()).addCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-                startActivity(intent);
+                ((CrimeListPagerActivity) getActivity()).gotoCrime();
                 return true;
 
             case R.id.menu_item_show_subtitle:
@@ -130,7 +127,7 @@ public class CrimeListFragment extends Fragment {
     /**
      * Update UI
      */
-    private void updateUI() {
+    protected void updateUI() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
@@ -144,7 +141,6 @@ public class CrimeListFragment extends Fragment {
 
         updateSubtitle();
     }
-
 
     @Override
     public void onResume() {

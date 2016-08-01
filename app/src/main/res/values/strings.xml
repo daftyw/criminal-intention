@@ -11,4 +11,5 @@
     <string name="subtitle_format">%d Crime(s)</string>
     <string name="hide_subtitle">Hide Subtitle</string>
     <string name="delete_crime">Delete this crime</string>
+    <string name="save_crime">Save</string>
 </resources>
