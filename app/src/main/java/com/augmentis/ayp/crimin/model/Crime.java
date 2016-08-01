@@ -13,8 +13,12 @@ public class Crime {
     private boolean solved;
 
     public Crime() {
+        this(UUID.randomUUID());
+    }
+
+    public Crime(UUID uuid) {
+        this.id = uuid;
         crimeDate = new Date();
-        id = UUID.randomUUID();
     }
 
     public String getTitle() {

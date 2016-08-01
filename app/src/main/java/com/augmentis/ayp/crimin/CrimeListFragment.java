@@ -138,6 +138,7 @@ public class CrimeListFragment extends Fragment {
             _adapter = new CrimeListAdapter(this, crimes);
             _crimeRecyclerView.setAdapter(_adapter);
         } else {
+            _adapter.setCrimes(crimeLab.getCrimes());
             _adapter.notifyDataSetChanged();
         }
 

@@ -9,6 +9,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -60,8 +63,13 @@ public class CrimeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UUID crimeId = (UUID) getArguments().getSerializable(CRIME_ID);
-        crime = CrimeLab.getInstance(getActivity()).getCrimeById(crimeId);
+        setHasOptionsMenu(true);
+
+        CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+
+        UUID crimeId =(UUID) getArguments().getSerializable(CRIME_ID);
+        crime = crimeLab.getCrimeById(crimeId);
+
         Log.d(TAG, "crime.getTitle()=" + crime.getTitle());
     }
 
@@ -153,5 +161,32 @@ public class CrimeFragment extends Fragment {
             crime.setCrimeDate(date);
             crimeTimeButton.setText(CrimeDateFormat.toTime(getActivity(), crime.getCrimeDate()));
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.getInstance(getActivity()).updateCrime(crime); // update crime in db
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.crime_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_crime:
+                CrimeLab.getInstance(getActivity()).deleteCrime(crime.getId());
+                getActivity().finish();
+                return true;
+            default:
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

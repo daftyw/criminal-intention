@@ -7,21 +7,27 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.augmentis.ayp.crimin.model.Crime;
 import com.augmentis.ayp.crimin.model.CrimeDateFormat;
+import com.augmentis.ayp.crimin.model.CrimeLab;
+
+import java.util.UUID;
 
 /**
  * Created by Rawin on 28-Jul-16.
  */
-public class CrimeListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener  {
+public class CrimeListViewHolder extends RecyclerView.ViewHolder
+        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+
     private static final String TAG = "CrimeListViewHolder";
     public TextView _titleTextView;
     public TextView _dateTextView;
     public CheckBox _solvedCheckBox;
 
-    Crime _crime;
+    UUID _crimeId;
     int _position;
 
     Fragment _f;
@@ -35,25 +41,35 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder implements View
                 itemView.findViewById(R.id.list_item_crime_title_text_view);
         _solvedCheckBox = (CheckBox)
                 itemView.findViewById(R.id.list_item_crime_solved_check_box);
-        _solvedCheckBox.setEnabled(false);
+
         _dateTextView = (TextView)
                 itemView.findViewById(R.id.list_item_crime_date_text_view);
 
+        _solvedCheckBox.setOnCheckedChangeListener(this);
         itemView.setOnClickListener(this);
     }
 
-    public void bind(Crime crime, int position) {
-        _crime = crime;
-        _position = position;
-        _titleTextView.setText(_crime.getTitle());
-        _dateTextView.setText(CrimeDateFormat.toFullDate(_f.getActivity(), _crime.getCrimeDate()));
-        _solvedCheckBox.setChecked(_crime.isSolved());
+    public void bind(Crime crime) {
+        _crimeId = crime.getId();
+
+        _titleTextView.setText(crime.getTitle());
+        _dateTextView.setText(CrimeDateFormat.toFullDate(_f.getActivity(), crime.getCrimeDate()));
+        _solvedCheckBox.setChecked(crime.isSolved());
     }
 
     @Override
     public void onClick(View v) {
         Log.d(TAG, "send position : " + _position);
-        Intent intent = CrimePagerActivity.newIntent(_f.getActivity(), _crime.getId());
+        Intent intent = CrimePagerActivity.newIntent(_f.getActivity(), _crimeId);
         _f.startActivity(intent);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        CrimeLab crimeLab = CrimeLab.getInstance(_f.getActivity());
+        Crime crime = crimeLab.getCrimeById(_crimeId);
+
+        crime.setSolved(isChecked);
+        crimeLab.updateCrime(crime);
     }
 }

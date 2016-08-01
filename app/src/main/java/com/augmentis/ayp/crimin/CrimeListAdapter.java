@@ -1,6 +1,5 @@
 package com.augmentis.ayp.crimin;
 
-import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,6 +25,10 @@ public class CrimeListAdapter extends RecyclerView.Adapter<CrimeListViewHolder> 
         _f = f;
     }
 
+    protected void setCrimes(List<Crime> crimes) {
+        _crimes = crimes;
+    }
+
     @Override
     public CrimeListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         _viewCreatingCount++;
@@ -41,7 +44,7 @@ public class CrimeListAdapter extends RecyclerView.Adapter<CrimeListViewHolder> 
         Log.d(TAG, "Bind view holder for CrimeList : position = " + position);
 
         Crime crime = _crimes.get(position);
-        holder.bind(crime, position);
+        holder.bind(crime);
     }
 
     @Override
