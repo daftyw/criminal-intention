@@ -2,11 +2,15 @@ package com.augmentis.ayp.crimin;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,7 +27,6 @@ import com.augmentis.ayp.crimin.model.Crime;
 import com.augmentis.ayp.crimin.model.CrimeDateFormat;
 import com.augmentis.ayp.crimin.model.CrimeLab;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,6 +42,8 @@ public class CrimeFragment extends Fragment {
 
     private static final int REQUEST_DATE = 2222;
     private static final int REQUEST_TIME = 2221;
+    private static final int REQUEST_CONTACT_SUSPECT = 29900;
+
     private static final String TAG = "CrimeFragment";
 
     private Crime crime;
@@ -47,6 +52,8 @@ public class CrimeFragment extends Fragment {
     private Button crimeDateButton;
     private Button crimeTimeButton;
     private CheckBox crimeSolvedCheckbox;
+    private Button crimeReportButton;
+    private Button crimeSuspectButton;
 
     public CrimeFragment() {}
 
@@ -137,6 +144,35 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        crimeReportButton = (Button) v.findViewById(R.id.crime_report);
+        crimeReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain"); // MIME Type
+                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+
+                i = Intent.createChooser(i, getString(R.string.send_report));
+
+                startActivity(i);
+            }
+        });
+
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+
+        crimeSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
+        crimeSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(pickContact, REQUEST_CONTACT_SUSPECT);
+            }
+        });
+
+        if (crime.getSuspect() != null) {
+            crimeSuspectButton.setText(crime.getSuspect());
+        }
+
         return v;
     }
 
@@ -160,6 +196,39 @@ public class CrimeFragment extends Fragment {
             // set
             crime.setCrimeDate(date);
             crimeTimeButton.setText(CrimeDateFormat.toTime(getActivity(), crime.getCrimeDate()));
+        }
+
+        if(requestCode == REQUEST_CONTACT_SUSPECT) {
+            if(data != null) {
+                Uri contactUri = data.getData();
+                String[] queryFields = new String[] { ContactsContract.Contacts.DISPLAY_NAME };
+
+                Cursor c = getActivity()
+                        .getContentResolver()
+                        .query(contactUri,
+                                queryFields,
+                                null,
+                                null,
+                                null);
+
+                try {
+                    if(c.getCount() == 0) {
+                        return ;
+                    }
+
+                    c.moveToFirst();
+                    String suspect = c.getString(
+                            c.getColumnIndex(
+                                ContactsContract.Contacts.DISPLAY_NAME
+                            )
+                    );
+
+                    crime.setSuspect(suspect);
+                    crimeSuspectButton.setText(suspect);
+                } finally {
+                    c.close();
+                }
+            }
         }
     }
 
@@ -188,5 +257,32 @@ public class CrimeFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String getCrimeReport() {
+        String solvedString = null;
+
+        if(crime.isSolved()) {
+            solvedString = getString(R.string.crime_report_solved);
+        } else {
+            solvedString = getString(R.string.crime_report_unsolved);
+        }
+
+        String dateFormat = "EEE, MMM dd";
+        String dateString = DateFormat.format(dateFormat,
+                crime.getCrimeDate()).toString();
+
+        String suspect = crime.getSuspect();
+
+        if(suspect == null) {
+            suspect = getString(R.string.crime_report_no_suspect);
+        } else {
+            suspect = getString(R.string.crime_report_with_suspect, suspect);
+        }
+
+        String report = getString(R.string.crime_report,
+                crime.getTitle(), dateString, solvedString, suspect);
+
+        return report;
     }
 }
