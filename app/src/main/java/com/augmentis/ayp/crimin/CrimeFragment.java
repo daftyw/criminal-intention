@@ -2,9 +2,11 @@ package com.augmentis.ayp.crimin;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -159,7 +161,8 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        //pickContact.addCategory(Intent.CATEGORY_HOME);
 
         crimeSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
         crimeSuspectButton.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +174,11 @@ public class CrimeFragment extends Fragment {
 
         if (crime.getSuspect() != null) {
             crimeSuspectButton.setText(crime.getSuspect());
+        }
+
+        PackageManager packageManager = getActivity().getPackageManager();
+        if(packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null ) {
+            crimeSuspectButton.setEnabled(false);
         }
 
         return v;
@@ -201,7 +209,9 @@ public class CrimeFragment extends Fragment {
         if(requestCode == REQUEST_CONTACT_SUSPECT) {
             if(data != null) {
                 Uri contactUri = data.getData();
-                String[] queryFields = new String[] { ContactsContract.Contacts.DISPLAY_NAME };
+                String[] queryFields = new String[] {
+                        ContactsContract.Contacts.DISPLAY_NAME,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER };
 
                 Cursor c = getActivity()
                         .getContentResolver()
@@ -217,11 +227,8 @@ public class CrimeFragment extends Fragment {
                     }
 
                     c.moveToFirst();
-                    String suspect = c.getString(
-                            c.getColumnIndex(
-                                ContactsContract.Contacts.DISPLAY_NAME
-                            )
-                    );
+                    String suspect = c.getString(0);
+                    suspect = suspect + ": " + c.getString(1);
 
                     crime.setSuspect(suspect);
                     crimeSuspectButton.setText(suspect);
