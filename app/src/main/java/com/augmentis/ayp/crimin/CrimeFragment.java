@@ -1,5 +1,6 @@
 package com.augmentis.ayp.crimin;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,8 +9,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Contacts;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -24,12 +27,14 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.augmentis.ayp.crimin.model.Crime;
 import com.augmentis.ayp.crimin.model.CrimeDateFormat;
 import com.augmentis.ayp.crimin.model.CrimeLab;
 
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 /**
@@ -44,6 +49,7 @@ public class CrimeFragment extends Fragment {
 
     private static final int REQUEST_DATE = 2222;
     private static final int REQUEST_TIME = 2221;
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 28197;
     private static final int REQUEST_CONTACT_SUSPECT = 29900;
 
     private static final String TAG = "CrimeFragment";
@@ -56,6 +62,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox crimeSolvedCheckbox;
     private Button crimeReportButton;
     private Button crimeSuspectButton;
+    private Button crimeCallSuspect;
 
     public CrimeFragment() {}
 
@@ -181,6 +188,16 @@ public class CrimeFragment extends Fragment {
             crimeSuspectButton.setEnabled(false);
         }
 
+        crimeCallSuspect = (Button) v.findViewById(R.id.crime_call_suspect);
+        crimeCallSuspect.setEnabled( crime.getSuspect() != null );
+        crimeCallSuspect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(hasCallPermission()) {
+                    callSuspect();
+                }
+            }
+        });
         return v;
     }
 
@@ -228,10 +245,11 @@ public class CrimeFragment extends Fragment {
 
                     c.moveToFirst();
                     String suspect = c.getString(0);
-                    suspect = suspect + ": " + c.getString(1);
+                    suspect = suspect + ":" + c.getString(1);
 
                     crime.setSuspect(suspect);
                     crimeSuspectButton.setText(suspect);
+                    crimeCallSuspect.setEnabled(suspect != null);
                 } finally {
                     c.close();
                 }
@@ -264,6 +282,62 @@ public class CrimeFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void callSuspect() {
+        Intent i = new Intent(Intent.ACTION_CALL);
+        StringTokenizer tokenizer = new StringTokenizer(crime.getSuspect(), ":");
+        String name = tokenizer.nextToken();
+        String phone = tokenizer.nextToken();
+        Log.d(TAG, "calling " + name + "/" + phone);
+        i.setData(Uri.parse("tel:" + phone));
+
+        startActivity(i);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CALL_PHONE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // Granted permission
+                    callSuspect();
+
+                } else {
+
+                    // Denied permission
+                    Toast.makeText(getActivity(),
+                            R.string.denied_permission_to_call,
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+                return;
+            }
+        }
+    }
+
+    private boolean hasCallPermission() {
+
+        // Check if permission is not granted
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(
+                    new String[]{
+                            Manifest.permission.CALL_PHONE
+                    },
+                    MY_PERMISSIONS_REQUEST_CALL_PHONE);
+
+            return false; // checking -- wait for dialog
+        }
+
+        return true; // already has permission
     }
 
     private String getCrimeReport() {
