@@ -33,5 +33,6 @@
     <string name="call_crime_suspect">Call suspect</string>
     <string name="pick_crime_time">Pick Time</string>
     <string name="pick_crime_date">Pick Date</string>
+    <string name="zero_item_list">We have no list please touch the button to add :-)</string>
 
 </resources>

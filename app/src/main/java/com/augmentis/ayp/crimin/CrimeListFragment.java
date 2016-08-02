@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.augmentis.ayp.crimin.model.Crime;
@@ -33,6 +34,7 @@ public class CrimeListFragment extends Fragment {
     private static final java.lang.String SUBTITLE_VISIBLE_STATE = "SUBTITLE_VISIBLE";
 
     private RecyclerView _crimeRecyclerView;
+    private View _zeroItemView;
 
     private CrimeListAdapter _adapter;
     private boolean _subtitleVisible;
@@ -41,6 +43,8 @@ public class CrimeListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_crime_list, container, false);
+
+        _zeroItemView = v.findViewById(R.id.zero_item_view);
 
         _crimeRecyclerView = (RecyclerView) v.findViewById(R.id.crime_recycler_view);
         _crimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -144,7 +148,18 @@ public class CrimeListFragment extends Fragment {
             _adapter.notifyDataSetChanged();
         }
 
+        updateZeroView(crimes.size() == 0);
         updateSubtitle();
+    }
+
+    private void updateZeroView(boolean visible) {
+        if(visible) {
+            _zeroItemView.setVisibility(View.VISIBLE);
+            _crimeRecyclerView.setVisibility(View.INVISIBLE);
+        } else {
+            _crimeRecyclerView.setVisibility(View.VISIBLE);
+            _zeroItemView.setVisibility(View.INVISIBLE);
+        }
     }
 
 
