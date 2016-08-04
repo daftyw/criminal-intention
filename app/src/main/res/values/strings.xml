@@ -10,6 +10,7 @@
     <string name="show_test_1">Test 1</string>
 
     <plurals name="subtitle_format">
+        <item quantity="zero">No crime</item>
         <item quantity="one">%d Crime</item>
         <item quantity="other">%d Crimes</item>
     </plurals>

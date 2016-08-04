@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Contacts;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -27,12 +28,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.augmentis.ayp.crimin.model.Crime;
 import com.augmentis.ayp.crimin.model.CrimeDateFormat;
 import com.augmentis.ayp.crimin.model.CrimeLab;
 
+import java.io.File;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -51,10 +55,12 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_TIME = 2221;
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 28197;
     private static final int REQUEST_CONTACT_SUSPECT = 29900;
+    private static final int REQUEST_CAPTURE_PHOTO = 29800;
 
     private static final String TAG = "CrimeFragment";
 
     private Crime crime;
+    private File photoFile;
 
     private EditText editText;
     private Button crimeDateButton;
@@ -63,6 +69,8 @@ public class CrimeFragment extends Fragment {
     private Button crimeReportButton;
     private Button crimeSuspectButton;
     private Button crimeCallSuspect;
+    private ImageView photoView;
+    private ImageButton photoButton;
 
     public CrimeFragment() {}
 
@@ -87,6 +95,8 @@ public class CrimeFragment extends Fragment {
         crime = crimeLab.getCrimeById(crimeId);
 
         Log.d(TAG, "crime.getTitle()=" + crime.getTitle());
+
+        photoFile = CrimeLab.getInstance(getActivity()).getPhotoFile(crime);
     }
 
     @Override
@@ -198,6 +208,31 @@ public class CrimeFragment extends Fragment {
                 }
             }
         });
+
+        photoButton = (ImageButton) v.findViewById(R.id.crime_camera);
+        photoView = (ImageView) v.findViewById(R.id.crime_photo);
+
+        // Call camera intent
+        final Intent captureImageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // check if we can take photo
+        boolean canTakePhoto = photoFile != null
+                && captureImageIntent.resolveActivity(packageManager) != null;
+
+        if (canTakePhoto) {
+            Uri uri = Uri.fromFile(photoFile);
+            Log.d(TAG, "File output at " + photoFile.getAbsolutePath());
+            captureImageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        }
+
+        // on click -> start activity for camera
+        photoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(captureImageIntent, REQUEST_CAPTURE_PHOTO);
+            }
+        });
+
         return v;
     }
 
