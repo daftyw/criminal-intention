@@ -8,12 +8,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.augmentis.ayp.crimin.model.Crime;
 import com.augmentis.ayp.crimin.model.CrimeDateFormat;
 import com.augmentis.ayp.crimin.model.CrimeLab;
+import com.augmentis.ayp.crimin.model.PictureUtils;
 
+import java.io.File;
 import java.util.UUID;
 
 /**
@@ -26,6 +29,7 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder
     public TextView _titleTextView;
     public TextView _dateTextView;
     public CheckBox _solvedCheckBox;
+    public ImageView _crimeImage;
 
     UUID _crimeId;
     int _position;
@@ -45,6 +49,9 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder
         _dateTextView = (TextView)
                 itemView.findViewById(R.id.list_item_crime_date_text_view);
 
+        _crimeImage = (ImageView)
+                itemView.findViewById(R.id.list_item_crime_photo);
+
         _solvedCheckBox.setOnCheckedChangeListener(this);
         itemView.setOnClickListener(this);
     }
@@ -55,6 +62,14 @@ public class CrimeListViewHolder extends RecyclerView.ViewHolder
         _titleTextView.setText(crime.getTitle());
         _dateTextView.setText(CrimeDateFormat.toFullDate(_f.getActivity(), crime.getCrimeDate()));
         _solvedCheckBox.setChecked(crime.isSolved());
+
+        File crimeImageFile = CrimeLab.getInstance(_f.getActivity()).getPhotoFile(crime);
+        if(crimeImageFile.exists()) {
+            _crimeImage.setImageBitmap(PictureUtils.getScaledBitmap(crimeImageFile.getPath(), 200, 200));
+            _crimeImage.setVisibility(View.VISIBLE);
+        } else {
+            _crimeImage.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

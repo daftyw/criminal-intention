@@ -48,7 +48,7 @@
             android:id="@+id/crime_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:hint="@string/crime_title_hint"
             android:layout_marginLeft="@dimen/button_vertical_margin"
             android:layout_marginRight="@dimen/button_vertical_margin" />
