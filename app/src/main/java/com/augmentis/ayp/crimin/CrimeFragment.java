@@ -12,6 +12,7 @@ import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -52,13 +53,14 @@ public class CrimeFragment extends Fragment {
 
     private static final String DIALOG_DATE = "CrimeFragment.DIALOG_DATE";
     private static final String DIALOG_TIME = "CrimeFragment.DIALOG_DATE";
+    private static final String DIALOG_IMAGE = "CrimeFragment.DIALOG_IMG";
 
     private static final int REQUEST_DATE = 2222;
     private static final int REQUEST_TIME = 2221;
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 28197;
     private static final int REQUEST_CONTACT_SUSPECT = 29900;
-    private static final int REQUEST_CAPTURE_PHOTO = 29800;
 
+    private static final int REQUEST_CAPTURE_PHOTO = 29800;
     private static final String TAG = "CrimeFragment";
 
     private Crime crime;
@@ -232,6 +234,18 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivityForResult(captureImageIntent, REQUEST_CAPTURE_PHOTO);
+            }
+        });
+
+        photoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(photoFile.exists()) {
+                    DialogFragment dialogFragment = ViewPhotoDialogFragment.newInstance(crime.getId());
+                    dialogFragment.show(getFragmentManager(), DIALOG_IMAGE);
+                } else {
+                    Toast.makeText(getActivity(), "Please take photo first", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
