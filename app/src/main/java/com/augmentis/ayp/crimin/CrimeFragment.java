@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Contacts;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import com.augmentis.ayp.crimin.model.Crime;
 import com.augmentis.ayp.crimin.model.CrimeDateFormat;
 import com.augmentis.ayp.crimin.model.CrimeLab;
+import com.augmentis.ayp.crimin.model.PictureUtils;
 
 import java.io.File;
 import java.util.Date;
@@ -233,6 +235,9 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        // update photo changing
+        updatePhotoView();
+
         return v;
     }
 
@@ -289,6 +294,10 @@ public class CrimeFragment extends Fragment {
                     c.close();
                 }
             }
+        }
+
+        if(requestCode == REQUEST_CAPTURE_PHOTO) {
+            updatePhotoView();
         }
     }
 
@@ -400,5 +409,16 @@ public class CrimeFragment extends Fragment {
                 crime.getTitle(), dateString, solvedString, suspect);
 
         return report;
+    }
+
+    private void updatePhotoView() {
+        if(photoFile == null || !photoFile.exists()) {
+            photoView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap( photoFile.getPath(),
+                    getActivity() );
+
+            photoView.setImageBitmap(bitmap);
+        }
     }
 }
