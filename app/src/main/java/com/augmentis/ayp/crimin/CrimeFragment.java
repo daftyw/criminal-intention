@@ -90,6 +90,18 @@ public class CrimeFragment extends Fragment {
         return crimeFragment;
     }
 
+    public UUID getCrimeId() {
+        if(this.crime != null) {
+            return this.crime.getId();
+        }
+        return null;
+    }
+
+    public void updateUI() {
+        reloadCrimeFromDB();
+        crimeSolvedCheckbox.setChecked(crime.isSolved());
+    }
+
     // Callback
     public interface Callbacks {
         void onCrimeUpdated(Crime crime);
@@ -107,17 +119,22 @@ public class CrimeFragment extends Fragment {
         callbacks = (Callbacks) context;
     }
 
+    /**
+     * Read ID argument the reload from DB
+     */
+    private void reloadCrimeFromDB() {
+        CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+
+        UUID crimeId =(UUID) getArguments().getSerializable(CRIME_ID);
+        crime = crimeLab.getCrimeById(crimeId);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
-        CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
-
-        UUID crimeId =(UUID) getArguments().getSerializable(CRIME_ID);
-        crime = crimeLab.getCrimeById(crimeId);
-
+        reloadCrimeFromDB();
         Log.d(TAG, "crime.getTitle()=" + crime.getTitle());
 
         photoFile = CrimeLab.getInstance(getActivity()).getPhotoFile(crime);
@@ -184,8 +201,8 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 crime.setSolved(isChecked);
-                updateCrime();
                 Log.d(TAG, "Crime:" + crime.toString());
+                updateCrime();
             }
         });
 
@@ -343,8 +360,7 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
-        updateCrime();
+        //updateCrime();
     }
 
     @Override
