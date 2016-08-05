@@ -1,6 +1,7 @@
 package com.augmentis.ayp.crimin;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -44,6 +45,23 @@ public class CrimeListFragment extends Fragment {
 
     private CrimeListAdapter _adapter;
     private boolean _subtitleVisible;
+    private Callbacks callbacks;
+
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbacks = (Callbacks) context; // activity
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
 
     @Nullable
     @Override
@@ -100,8 +118,11 @@ public class CrimeListFragment extends Fragment {
 
                 Crime crime = new Crime();
                 CrimeLab.getInstance(getActivity()).addCrime(crime);
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-                startActivity(intent);
+
+                // support tablet
+                updateUI();
+                callbacks.onCrimeSelected(crime);
+
                 return true;
 
             case R.id.menu_item_show_subtitle:
@@ -142,7 +163,7 @@ public class CrimeListFragment extends Fragment {
     /**
      * Update UI
      */
-    private void updateUI() {
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
@@ -168,14 +189,12 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "Resume list");
-        updateUI();
+        updateUI(); // refresh List
     }
-
 
     public class CrimeListViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -225,9 +244,9 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
+            Crime crime = CrimeLab.getInstance(getActivity()).getCrimeById(_crimeId);
             Log.d(TAG, "send position : " + _position);
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), _crimeId);
-            startActivity(intent);
+            callbacks.onCrimeSelected(crime);
         }
 
         @Override

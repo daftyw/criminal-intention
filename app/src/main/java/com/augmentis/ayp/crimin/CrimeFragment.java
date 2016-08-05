@@ -2,6 +2,7 @@ package com.augmentis.ayp.crimin;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -76,6 +77,8 @@ public class CrimeFragment extends Fragment {
     private ImageView photoView;
     private ImageButton photoButton;
 
+    private Callbacks callbacks;
+
     public CrimeFragment() {}
 
     public static CrimeFragment newInstance(UUID crimeId) {
@@ -85,6 +88,23 @@ public class CrimeFragment extends Fragment {
         CrimeFragment crimeFragment = new CrimeFragment();
         crimeFragment.setArguments(args);
         return crimeFragment;
+    }
+
+    // Callback
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbacks = (Callbacks) context;
     }
 
     @Override
@@ -118,6 +138,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 crime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -163,6 +184,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 crime.setSolved(isChecked);
+                updateCrime();
                 Log.d(TAG, "Crime:" + crime.toString());
             }
         });
@@ -266,6 +288,7 @@ public class CrimeFragment extends Fragment {
 
             // set
             crime.setCrimeDate(date);
+            updateCrime();
             crimeDateButton.setText(CrimeDateFormat.toShortDate(crime.getCrimeDate()));
         }
 
@@ -274,6 +297,7 @@ public class CrimeFragment extends Fragment {
 
             // set
             crime.setCrimeDate(date);
+            updateCrime();
             crimeTimeButton.setText(CrimeDateFormat.toTime(getActivity(), crime.getCrimeDate()));
         }
 
@@ -302,6 +326,7 @@ public class CrimeFragment extends Fragment {
                     suspect = suspect + ":" + c.getString(1);
 
                     crime.setSuspect(suspect);
+                    updateCrime();
                     crimeSuspectButton.setText(suspect);
                     crimeCallSuspect.setEnabled(suspect != null);
                 } finally {
@@ -319,7 +344,7 @@ public class CrimeFragment extends Fragment {
     public void onPause() {
         super.onPause();
 
-        CrimeLab.getInstance(getActivity()).updateCrime(crime); // update crime in db
+        updateCrime();
     }
 
     @Override
@@ -351,6 +376,11 @@ public class CrimeFragment extends Fragment {
         i.setData(Uri.parse("tel:" + phone));
 
         startActivity(i);
+    }
+
+    private void updateCrime() {
+        CrimeLab.getInstance(getActivity()).updateCrime(crime); // update crime in db
+        callbacks.onCrimeUpdated(crime);
     }
 
     @Override

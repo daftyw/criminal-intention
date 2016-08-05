@@ -1,6 +1,7 @@
 package com.augmentis.ayp.crimin;
 
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,16 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     private static final String TAG = "SingleFragmentActivity";
 
+    @LayoutRes
+    protected int getLayoutResId() {
+        return
+                R.layout.activity_masterdetail;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_fragment);
+        setContentView(getLayoutResId());
 
         Log.d(TAG, "On create activity");
 
