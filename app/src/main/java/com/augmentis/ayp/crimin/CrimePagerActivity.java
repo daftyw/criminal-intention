@@ -42,4 +42,9 @@ public class CrimePagerActivity extends SingleFragmentActivity implements CrimeF
     public void onCrimeUpdated(Crime crime) {
         // TODO I will see what I can do here.
     }
+
+    @Override
+    public void onCrimeDeleted() {
+        finish();
+    }
 }

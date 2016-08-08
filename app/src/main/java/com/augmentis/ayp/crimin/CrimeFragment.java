@@ -105,6 +105,7 @@ public class CrimeFragment extends Fragment {
     // Callback
     public interface Callbacks {
         void onCrimeUpdated(Crime crime);
+        void onCrimeDeleted();
     }
 
     @Override
@@ -374,10 +375,9 @@ public class CrimeFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_delete_crime:
                 CrimeLab.getInstance(getActivity()).deleteCrime(crime.getId());
-                getActivity().finish();
+                callbacks.onCrimeDeleted();
                 return true;
             default:
-
         }
 
         return super.onOptionsItemSelected(item);
